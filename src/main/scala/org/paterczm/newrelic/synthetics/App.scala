@@ -10,15 +10,15 @@ object App extends App {
 	}
 
 	val parser = new scopt.OptionParser[Cli]("monitor-manager") {
-		head("monitor-manager", "0.1-SNAPSHOT")
+		head("Command line tool to manage New Relic Synthetics Monitors")
 
-		opt[String]('k', "apiKey").required().valueName("Synthetics apiKey")
+		opt[String]('k', "apiKey").required().valueName("Synthetics apiKey (see https://docs.newrelic.com/docs/apis/getting-started/intro-apis/understand-new-relic-api-keys)")
 			.action((str, cli) => cli.copy(apiKey = str))
 
 		cmd("push").action((_, cli) => cli.copy(action = "push"))
 			.text("Create monitors. If monitor ids are provided, it will overwrite existing monitors.")
 			.children(
-				opt[String]('c', "monitorsConfigFile").required().valueName("Path to config file with monitors")
+				opt[String]('c', "monitorsConfigFile").required().valueName("Path to config file with monitors. See MonitorsTest.scala for expected structure.")
 					.action((str, cli) => cli.copy(path = str)))
 	}
 
