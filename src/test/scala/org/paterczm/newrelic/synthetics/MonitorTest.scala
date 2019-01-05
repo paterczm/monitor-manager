@@ -28,8 +28,7 @@ class MonitorTest extends FlatSpec with Matchers {
                 "Environment:Preprod",
                 "Team:ThatTeam",
                 "Foo:Bar"
-              ],
-              "alert-policy": "foo"
+              ]
             },
             "slaThreshold": 7.0,
             "status": "ENABLED",
@@ -53,9 +52,9 @@ class MonitorTest extends FlatSpec with Matchers {
 		monitor.locations.size should be(2)
 	}
 
-	"monitor.options-custom" should "include labels and alert policy ref" in {
+	"monitor.options-custom" should "include labels" in {
 		monitor.`options-custom`.labels.size should be(3)
-		monitor.`options-custom`.`alert-policy` should be("foo")
+		monitor.`options-custom`.alertPolicyId should be(None)
 	}
 
 	"monitor" should "serialize without custom-options when ignoreCustomOptions=true" in {

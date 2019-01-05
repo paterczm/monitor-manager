@@ -30,7 +30,7 @@ class MonitorsTest extends FlatSpec with Matchers {
                 "Team:ThatTeam",
                 "Foo:Bar"
               ],
-              "alert-policy": "foo"
+              "alertPolicyId": 1
             },
             "slaThreshold": 7.0,
             "status": "ENABLED",
@@ -51,7 +51,7 @@ class MonitorsTest extends FlatSpec with Matchers {
                 "Team:ThatTeam",
                 "Foo:Bar"
               ],
-              "alert-policy": "foo"
+              "alertPolicyId": 1
             },
             "slaThreshold": 7.0,
             "status": "ENABLED",

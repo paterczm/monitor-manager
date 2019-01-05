@@ -13,7 +13,7 @@ import java.nio.file.Files
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 
-case class CustomOptions(labels: Set[String], `alert-policy`: String)
+case class CustomOptions(labels: Set[String], alertPolicyId: Option[Int])
 
 case class Monitor(var id: Option[String], frequency: Int, locations: Set[String], name: String, uri: String, `options-custom`: CustomOptions, slaThreshold: String, status: String, `type`: String)
 

@@ -7,6 +7,8 @@ import org.json4s.jackson.JsonMethods._
 
 class Client(val apiKey: String) {
 
+	val headers = Seq(("X-Api-Key", apiKey), ("Content-Type", "application/json"), ("Accept", "application/json"))
+
 	def handleError(res: HttpResponse[String]) = res.code match {
 		case s if s >= 200 && s <= 299 => ;
 		case s if s >= 400 && s <= 499 =>
@@ -22,12 +24,14 @@ class Client(val apiKey: String) {
 		.method("DELETE")
 		.asString
 
-	def createPingMonitor(monitor: Monitor) = Http("https://synthetics.newrelic.com/synthetics/api/v3/monitors")
+	def createMonitor(monitor: Monitor) = Http("https://synthetics.newrelic.com/synthetics/api/v3/monitors")
 		.header("X-Api-Key", apiKey)
 		.header("Content-Type", "application/json")
 		.postData(Monitor.unapply(monitor, true))
 		.asString
 
+	// https://docs.newrelic.com/docs/apis/synthetics-rest-api/label-examples/use-synthetics-label-apis
+	// the api does not provide means to update labels
 	def labelMonitor(labels: Set[String], monitorUUID: String) {
 		labels.foreach(label => {
 
@@ -43,15 +47,27 @@ class Client(val apiKey: String) {
 		})
 	}
 
-	def addNotificationsToMonitor(monitorUUID: String, emails: Set[String]) = Http(s"https://synthetics.newrelic.com/synthetics/api/v1/monitors/$monitorUUID/notifications")
+	def addLegacyNotificationsToMonitor(monitorUUID: String, emails: Set[String]) = Http(s"https://synthetics.newrelic.com/synthetics/api/v1/monitors/$monitorUUID/notifications")
 		.header("X-Api-Key", apiKey)
 		.header("Content-Type", "application/json")
 		.postData(s"""{"count": ${emails.size}, "emails": ["${emails.mkString("\"")}"]}""")
 		.asString
 
-	def createPingMonitorWithCustomOptions(monitor: Monitor) = {
+	// https://rpm.newrelic.com/api/explore/alerts_synthetics_conditions/create
+	def createAlertCondition(monitor: Monitor) = Http(s"https://api.newrelic.com/v2/alerts_synthetics_conditions/policies/${monitor.`options-custom`.alertPolicyId.get}.json")
+		.headers(headers)
+		.postData(s"""{
+  "synthetics_condition": {
+    "name": "${monitor.name}",
+    "monitor_id": "${monitor.id.get}",
+    "enabled": true
+  }
+}""").asString
 
-		val res = createPingMonitor(monitor)
+
+	def createMonitorWithCustomOptions(monitor: Monitor) = {
+
+		val res = createMonitor(monitor)
 
 		handleError(res)
 
@@ -60,6 +76,17 @@ class Client(val apiKey: String) {
 		println(s"Successfully created monitor uuid=$uuid")
 
 		labelMonitor(monitor.`options-custom`.labels, uuid)
+
+		monitor.id = Some(uuid)
+
+		monitor.`options-custom`.alertPolicyId match {
+			case None => ;
+			case Some(x) => {
+				val acres = createAlertCondition(monitor)
+
+				handleError(acres)
+			}
+		}
 
 		uuid
 	}

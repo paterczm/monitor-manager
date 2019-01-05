@@ -2,6 +2,8 @@ package org.paterczm.newrelic.synthetics
 
 import java.nio.file.Path
 import java.nio.file.Paths
+import scalaj.http.Http
+import java.net.HttpURLConnection
 
 object App extends App {
 
@@ -36,16 +38,11 @@ object App extends App {
 						{
 							monitor.id match {
 								case None => {
-									val uuid = client.createPingMonitorWithCustomOptions(monitor)
+									val uuid = client.createMonitorWithCustomOptions(monitor)
 									monitor.id = Some(uuid)
 								}
 								case Some(uuid) => {
-									// delete and create monitor
-									// TODO: this is easy to implement, but results in history getting lost (availability, load time, etc.)
-									client.deleteMonitor(uuid)
-									monitor.id = None
-									val newUuid = client.createPingMonitorWithCustomOptions(monitor)
-									monitor.id = Some(newUuid)
+									println("Updates are not supported yet")
 								}
 							}
 
