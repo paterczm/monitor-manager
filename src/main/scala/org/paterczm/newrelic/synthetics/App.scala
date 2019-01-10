@@ -34,21 +34,9 @@ object App extends App {
 
 					val config = MonitorsConfig.fromFile(Paths.get(cli.path))
 
-					config.monitors foreach { monitor =>
-						{
-							monitor.id match {
-								case None => {
-									val uuid = client.createMonitorWithCustomOptions(monitor)
-									monitor.id = Some(uuid)
-								}
-								case Some(uuid) => {
-									println("Updates are not supported yet")
-								}
-							}
+					config.monitors foreach { monitor => client.createOrUpdateMonitorWithCustomOptions(monitor)	}
 
-							MonitorsConfig.toFile(config, Paths.get(cli.path))
-						}
-					}
+					MonitorsConfig.toFile(config, Paths.get(cli.path))
 				}
 			}
 

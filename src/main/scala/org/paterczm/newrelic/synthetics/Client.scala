@@ -30,6 +30,12 @@ class Client(val apiKey: String) {
 		.postData(Monitor.unapply(monitor, true))
 		.asString
 
+	// https://docs.newrelic.com/docs/apis/synthetics-rest-api/monitor-examples/manage-synthetics-monitors-rest-api#update-monitor
+	def updateMonitor(monitor: Monitor) = Http(s"https://synthetics.newrelic.com/synthetics/api/v3/monitors/${monitor.id.get}")
+		.headers(headers)
+		.put(Monitor.unapply(monitor, true))
+		.asString
+
 	// https://docs.newrelic.com/docs/apis/synthetics-rest-api/label-examples/use-synthetics-label-apis
 	// the api does not provide means to update labels
 	def labelMonitor(labels: Set[String], monitorUUID: String) {
@@ -64,31 +70,45 @@ class Client(val apiKey: String) {
   }
 }""").asString
 
+	def createOrUpdateMonitorWithCustomOptions(monitor: Monitor) = {
 
-	def createMonitorWithCustomOptions(monitor: Monitor) = {
+		val res = monitor.id match {
+			case None => {
+				val res = createMonitor(monitor)
 
-		val res = createMonitor(monitor)
+				handleError(res)
 
-		handleError(res)
+				val uuid = extractUUID(res)
 
-		val uuid = extractUUID(res)
+				println(s"Successfully created monitor uuid=$uuid")
 
-		println(s"Successfully created monitor uuid=$uuid")
+				labelMonitor(monitor.`options-custom`.labels, uuid)
 
-		labelMonitor(monitor.`options-custom`.labels, uuid)
+				monitor.id = Some(uuid)
 
-		monitor.id = Some(uuid)
+				monitor.`options-custom`.alertPolicyId match {
+					case None => ;
+					case Some(x) => {
+						val acres = createAlertCondition(monitor)
 
-		monitor.`options-custom`.alertPolicyId match {
-			case None => ;
-			case Some(x) => {
-				val acres = createAlertCondition(monitor)
+						handleError(acres)
+					}
+				}
 
-				handleError(acres)
+				uuid
+			}
+			case Some(uuid) => {
+				val res = updateMonitor(monitor)
+
+				handleError(res)
+
+				println(s"Successfully updated monitor uuid=$uuid")
+
+				labelMonitor(monitor.`options-custom`.labels, uuid)
+
+				uuid
 			}
 		}
-
-		uuid
 	}
 
 	def extractUUID(res: HttpResponse[String]) = {
