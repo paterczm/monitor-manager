@@ -17,11 +17,22 @@ object App extends App {
 		opt[String]('k', "apiKey").required().valueName("Synthetics apiKey (see https://docs.newrelic.com/docs/apis/getting-started/intro-apis/understand-new-relic-api-keys)")
 			.action((str, cli) => cli.copy(apiKey = str))
 
-		cmd("push").action((_, cli) => cli.copy(action = "push"))
-			.text("Create monitors. If monitor ids are provided, it will update existing monitors.")
+		cmd("monitors")
+			.text("Monitor related operations")
 			.children(
-				opt[String]('c', "monitorsConfigFile").required().valueName("Path to config file with monitors. See MonitorsTest.scala for expected structure.")
-					.action((str, cli) => cli.copy(path = str)))
+				cmd("push").action((_, cli) => cli.copy(action = "monitors-push"))
+					.text("Create monitors. If monitor ids are provided, it will update existing monitors.")
+					.children(
+						opt[String]('c', "monitorsConfigFile").required().valueName("Path to config file with monitors. See MonitorsTest.scala for expected structure.")
+							.action((str, cli) => cli.copy(path = str)))
+			)
+
+		cmd("locations")
+			.text("Location related operations")
+			.children(
+				cmd("pull").action((_, cli) => cli.copy(action = "locations-pull"))
+					.text("Pull a list of available monitors")
+			)
 	}
 
 	parser.parse(args, new Cli()) match {
@@ -31,7 +42,7 @@ object App extends App {
 			val manager = new Manager(client)
 
 			cli.action match {
-				case "push" => {
+				case "monitors-push" => {
 
 					val config = MonitorsConfig.fromFile(Paths.get(cli.path))
 
@@ -39,6 +50,7 @@ object App extends App {
 
 					MonitorsConfig.toFile(config, Paths.get(cli.path))
 				}
+				case _ => println("Not supported")
 			}
 
 		}
