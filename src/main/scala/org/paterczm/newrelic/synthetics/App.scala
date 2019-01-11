@@ -18,7 +18,7 @@ object App extends App {
 			.action((str, cli) => cli.copy(apiKey = str))
 
 		cmd("push").action((_, cli) => cli.copy(action = "push"))
-			.text("Create monitors. If monitor ids are provided, it will overwrite existing monitors.")
+			.text("Create monitors. If monitor ids are provided, it will update existing monitors.")
 			.children(
 				opt[String]('c', "monitorsConfigFile").required().valueName("Path to config file with monitors. See MonitorsTest.scala for expected structure.")
 					.action((str, cli) => cli.copy(path = str)))
@@ -28,13 +28,14 @@ object App extends App {
 		case Some(cli) => {
 
 			val client = new Client(cli.apiKey)
+			val manager = new Manager(client)
 
 			cli.action match {
 				case "push" => {
 
 					val config = MonitorsConfig.fromFile(Paths.get(cli.path))
 
-					config.monitors foreach { monitor => client.createOrUpdateMonitorWithCustomOptions(monitor)	}
+					config.monitors foreach { monitor => manager.createOrUpdateMonitorWithCustomOptions(monitor)	}
 
 					MonitorsConfig.toFile(config, Paths.get(cli.path))
 				}

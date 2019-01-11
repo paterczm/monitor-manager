@@ -9,15 +9,6 @@ class Client(val apiKey: String) {
 
 	val headers = Seq(("X-Api-Key", apiKey), ("Content-Type", "application/json"), ("Accept", "application/json"))
 
-	def handleError(res: HttpResponse[String]) = res.code match {
-		case s if s >= 200 && s <= 299 => ;
-		case s if s >= 400 && s <= 499 =>
-			println((parse(res.body) \\ "error").values); System.exit(1)
-		case _ => println(s"Error: $res"); System.exit(1)
-	}
-	
-	def deleteMonitor(monitor: Monitor): HttpResponse[String] = deleteMonitor(monitor.id.get)
-
 	def deleteMonitor(uuid: String) = Http(s"https://synthetics.newrelic.com/synthetics/api/v3/monitors/$uuid")
 		.header("X-Api-Key", apiKey)
 		.header("Content-Type", "application/json")
@@ -38,20 +29,11 @@ class Client(val apiKey: String) {
 
 	// https://docs.newrelic.com/docs/apis/synthetics-rest-api/label-examples/use-synthetics-label-apis
 	// the api does not provide means to update labels
-	def labelMonitor(labels: Set[String], monitorUUID: String) {
-		labels.foreach(label => {
-
-			println(s"Creating label $label")
-
-			val res = Http(s"https://synthetics.newrelic.com/synthetics/api/v4/monitors/$monitorUUID/labels")
+	def addLabelToMonitor(label: String, monitorUUID: String) = Http(s"https://synthetics.newrelic.com/synthetics/api/v4/monitors/$monitorUUID/labels")
 				.header("X-Api-Key", apiKey)
 				.header("Content-Type", "application/json")
 				.postData(label)
 				.asString
-
-			handleError(res)
-		})
-	}
 
 	def addLegacyNotificationsToMonitor(monitorUUID: String, emails: Set[String]) = Http(s"https://synthetics.newrelic.com/synthetics/api/v1/monitors/$monitorUUID/notifications")
 		.header("X-Api-Key", apiKey)
@@ -69,51 +51,5 @@ class Client(val apiKey: String) {
     "enabled": true
   }
 }""").asString
-
-	def createOrUpdateMonitorWithCustomOptions(monitor: Monitor) = {
-
-		val res = monitor.id match {
-			case None => {
-				val res = createMonitor(monitor)
-
-				handleError(res)
-
-				val uuid = extractUUID(res)
-
-				println(s"Successfully created monitor uuid=$uuid")
-
-				labelMonitor(monitor.`options-custom`.labels, uuid)
-
-				monitor.id = Some(uuid)
-
-				monitor.`options-custom`.alertPolicyId match {
-					case None => ;
-					case Some(x) => {
-						val acres = createAlertCondition(monitor)
-
-						handleError(acres)
-					}
-				}
-
-				uuid
-			}
-			case Some(uuid) => {
-				val res = updateMonitor(monitor)
-
-				handleError(res)
-
-				println(s"Successfully updated monitor uuid=$uuid")
-
-				labelMonitor(monitor.`options-custom`.labels, uuid)
-
-				uuid
-			}
-		}
-	}
-
-	def extractUUID(res: HttpResponse[String]) = {
-		val location = res.header("Location").get
-		location.substring(location.lastIndexOf('/') + 1)
-	}
 
 }
