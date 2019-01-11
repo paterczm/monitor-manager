@@ -7,7 +7,7 @@ import org.json4s.jackson.JsonMethods._
 
 class Manager(client: Client) {
 
-		def createOrUpdateMonitorWithCustomOptions(monitor: Monitor) = {
+	def createOrUpdateMonitorWithCustomOptions(monitor: Monitor) = {
 
 		monitor.id match {
 			case None => {
