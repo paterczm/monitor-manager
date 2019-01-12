@@ -52,4 +52,8 @@ class Client(val apiKey: String) {
   }
 }""").asString
 
+  def listLocations() = Http("https://synthetics.newrelic.com/synthetics/api/v1/locations")
+    .headers(headers)
+    .asString
+
 }

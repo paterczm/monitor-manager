@@ -50,6 +50,9 @@ object App extends App {
 
 					MonitorsConfig.toFile(config, Paths.get(cli.path))
 				}
+				case "locations-pull" => {
+					println(manager.listLocations())
+				}
 				case _ => println("Not supported")
 			}
 

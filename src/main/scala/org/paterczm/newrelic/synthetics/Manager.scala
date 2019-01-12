@@ -5,7 +5,12 @@ import scalaj.http.HttpResponse
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 
+import org.json4s.jackson.Serialization
+import org.json4s.jackson.Serialization.{ read, write, writePretty }
+
 class Manager(client: Client) {
+
+	implicit val format = DefaultFormats
 
 	def createOrUpdateMonitorWithCustomOptions(monitor: Monitor) = {
 
@@ -69,6 +74,14 @@ class Manager(client: Client) {
 		case s if s >= 400 && s <= 499 =>
 			println((parse(res.body) \\ "error").values); System.exit(1)
 		case _ => println(s"Error: $res"); System.exit(1)
+	}
+
+	def listLocations() = {
+		val res = client.listLocations()
+
+		handleError(res)
+
+		writePretty(parse(res.body))
 	}
 
 }
