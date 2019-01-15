@@ -9,7 +9,18 @@ To use this tool, new need to have a new relic account and [api keys](https://do
 
 Requires java 8 or later to run.
 
-TBD
+To install or update:
+```
+$ curl -L https://github.com/paterczm/monitor-manager/raw/master/bin/monitor-manager-latest.jar > ~/bin/monitor-manager.jar && curl -L https://raw.githubusercontent.com/paterczm/monitor-manager/master/bin/monitor-manager > ~/bin/monitor-manager && chmod +x ~/bin/monitor-manager
+
+# Test
+$ monitor-manager
+Error: Missing option --apiKey
+Command line tool to manage New Relic Synthetics Monitors
+Usage:
+(...)
+
+```
 
 ## Usage
 
