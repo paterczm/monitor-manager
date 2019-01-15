@@ -48,6 +48,15 @@ class Manager(client: Client) {
 
 				labelMonitor(monitor.`options-custom`.labels, uuid)
 
+				monitor.`options-custom`.alertPolicyId match {
+					case None => ;
+					case Some(x) => {
+						val acres = client.createAlertCondition(monitor)
+
+						handleError(acres)
+					}
+				}
+
 				uuid
 			}
 		}
