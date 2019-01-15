@@ -7,8 +7,8 @@ import java.net.HttpURLConnection
 
 object App extends App {
 
-	case class Cli(apiKey: String, path: String, action: String) {
-		def this() = this(null, null, null)
+	case class Cli(apiKey: String, path: String, action: String, label: String) {
+		def this() = this(null, null, null, null)
 	}
 
 	val parser = new scopt.OptionParser[Cli]("monitor-manager") {
@@ -24,7 +24,14 @@ object App extends App {
 					.text("Create monitors. If monitor ids are provided, it will update existing monitors.")
 					.children(
 						opt[String]('c', "monitorsConfigFile").required().valueName("Path to config file with monitors. See MonitorsTest.scala for expected structure.")
-							.action((str, cli) => cli.copy(path = str)))
+							.action((str, cli) => cli.copy(path = str))
+					 ),
+				cmd("pull").action((_, cli) => cli.copy(action = "monitors-pull"))
+					.text("List monitors by label")
+					.children(
+						opt[String]('l', "label").required().valueName("Label, e.g. Team:Paas")
+							.action((str, cli) => cli.copy(label = str))
+					)
 			)
 
 		cmd("locations")
@@ -49,6 +56,9 @@ object App extends App {
 					config.monitors foreach { monitor => manager.createOrUpdateMonitorWithCustomOptions(monitor)	}
 
 					MonitorsConfig.toFile(config, Paths.get(cli.path))
+				}
+				case "monitors-pull" => {
+					println(manager.listMonitorsByLabel(cli.label))
 				}
 				case "locations-pull" => {
 					println(manager.listLocations())

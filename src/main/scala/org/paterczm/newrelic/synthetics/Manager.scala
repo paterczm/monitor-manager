@@ -53,6 +53,16 @@ class Manager(client: Client) {
 		}
 	}
 
+	// TODO: this should return actual monitors, not just refs :/
+	def listMonitorsByLabel(label: String) = {
+
+		val res = client.listMonitorsByLabel(label)
+
+		handleError(res)
+
+		writePretty(parse(res.body))
+	}
+
 	def labelMonitor(labels: Set[String], monitorUUID: String) {
 		labels.foreach(label => {
 
@@ -64,24 +74,24 @@ class Manager(client: Client) {
 		})
 	}
 
-	def extractUUID(res: HttpResponse[String]) = {
-		val location = res.header("Location").get
-		location.substring(location.lastIndexOf('/') + 1)
-	}
-
-	def handleError(res: HttpResponse[String]) = res.code match {
-		case s if s >= 200 && s <= 299 => ;
-		case s if s >= 400 && s <= 499 =>
-			println((parse(res.body) \\ "error").values); System.exit(1)
-		case _ => println(s"Error: $res"); System.exit(1)
-	}
-
 	def listLocations() = {
 		val res = client.listLocations()
 
 		handleError(res)
 
 		writePretty(parse(res.body))
+	}
+
+	private def extractUUID(res: HttpResponse[String]) = {
+		val location = res.header("Location").get
+		location.substring(location.lastIndexOf('/') + 1)
+	}
+
+	private def handleError(res: HttpResponse[String]) = res.code match {
+		case s if s >= 200 && s <= 299 => ;
+		case s if s >= 400 && s <= 499 =>
+			println((parse(res.body) \\ "error").values); System.exit(1)
+		case _ => println(s"Error: $res"); System.exit(1)
 	}
 
 }

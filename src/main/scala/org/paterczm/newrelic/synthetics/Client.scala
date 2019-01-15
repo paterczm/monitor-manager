@@ -21,6 +21,14 @@ class Client(val apiKey: String) {
 		.postData(Monitor.unapply(monitor, true))
 		.asString
 
+	def listMonitorsByLabel(label: String) = Http(s"https://synthetics.newrelic.com/synthetics/api/v4/monitors/labels/$label")
+		.headers(headers)
+		.asString
+
+	def getMonitor(uuid: String) = Http(s"https://synthetics.newrelic.com/synthetics/api/v3/monitors/${uuid}")
+		.headers(headers)
+		.asString
+
 	// https://docs.newrelic.com/docs/apis/synthetics-rest-api/monitor-examples/manage-synthetics-monitors-rest-api#update-monitor
 	def updateMonitor(monitor: Monitor) = Http(s"https://synthetics.newrelic.com/synthetics/api/v3/monitors/${monitor.id.get}")
 		.headers(headers)
