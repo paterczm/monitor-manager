@@ -82,6 +82,14 @@ class Manager(client: Client) {
 		writePretty(parse(res.body))
 	}
 
+		def listAlertPolicies() = {
+		val res = client.listAlertPolicies()
+
+		handleError(res)
+
+		writePretty(parse(res.body))
+	}
+
 	private def extractUUID(res: HttpResponse[String]) = {
 		val location = res.header("Location").get
 		location.substring(location.lastIndexOf('/') + 1)

@@ -64,4 +64,8 @@ class Client(val apiKey: String) {
     .headers(headers)
     .asString
 
+  def listAlertPolicies() = Http("https://api.newrelic.com/v2/alerts_policies.json")
+    .headers(headers)
+    .asString
+
 }

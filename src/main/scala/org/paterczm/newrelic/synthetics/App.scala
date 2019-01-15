@@ -39,7 +39,14 @@ object App extends App {
 			.children(
 				cmd("pull").action((_, cli) => cli.copy(action = "locations-pull"))
 					.text("Pull a list of available monitors")
-			)
+		)
+
+		cmd("alertpolicies")
+			.text("Alert Policy related operations")
+			.children(
+				cmd("pull").action((_, cli) => cli.copy(action = "alertpolicies-pull"))
+					.text("Pull all alert policies")
+		)
 	}
 
 	parser.parse(args, new Cli()) match {
@@ -62,6 +69,9 @@ object App extends App {
 				}
 				case "locations-pull" => {
 					println(manager.listLocations())
+				}
+				case "alertpolicies-pull" => {
+					println(manager.listAlertPolicies())
 				}
 				case _ => println("Not supported")
 			}
