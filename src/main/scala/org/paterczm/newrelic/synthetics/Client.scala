@@ -4,6 +4,7 @@ import scalaj.http.Http
 import scalaj.http.HttpResponse
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
+import scalaj.http.HttpConstants._
 
 class Client(val apiKey: String) {
 
@@ -42,6 +43,12 @@ class Client(val apiKey: String) {
 				.header("Content-Type", "application/json")
 				.postData(label)
 				.asString
+
+	// https://synthetics.newrelic.com/synthetics/api/v3/monitors/{id}/script
+	def updateScriptOnMonitor(monitorUUID: String, script: String) = Http(s"https://synthetics.newrelic.com/synthetics/api/v3/monitors/${monitorUUID}/script")
+		.headers(headers)
+		.put(s"""{"scriptText": "${base64(script)}"}""")
+		.asString
 
 	def addLegacyNotificationsToMonitor(monitorUUID: String, emails: Set[String]) = Http(s"https://synthetics.newrelic.com/synthetics/api/v1/monitors/$monitorUUID/notifications")
 		.header("X-Api-Key", apiKey)

@@ -57,6 +57,15 @@ class Manager(client: Client) {
 					}
 				}
 
+				monitor.`options-custom`.script match {
+					case None => ;
+					case Some(script) => {
+						val scres = client.updateScriptOnMonitor(uuid, script)
+
+						handleError(scres)
+					}
+				}
+
 				uuid
 			}
 		}

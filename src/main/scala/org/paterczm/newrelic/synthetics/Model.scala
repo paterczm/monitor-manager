@@ -1,28 +1,39 @@
 package org.paterczm.newrelic.synthetics
 
-import org.json4s._
-import org.json4s.jackson.JsonMethods._
-
-import org.json4s.jackson.Serialization
-import org.json4s.jackson.Serialization.{ read, write, writePretty }
-import java.io.File
-import scala.io.Source
-import java.io.PrintWriter
-import java.nio.file.Paths
-import java.nio.file.Files
 import java.nio.charset.StandardCharsets
+import java.nio.file.Files
 import java.nio.file.Path
 
-case class CustomOptions(labels: Set[String], alertPolicyId: Option[Int])
+import org.json4s.DefaultFormats
+import org.json4s.FieldSerializer
+import org.json4s.JValue
+import org.json4s.ext.EnumNameSerializer
+import org.json4s.jackson.JsonMethods.parse
+import org.json4s.jackson.Serialization.writePretty
+import org.json4s.jvalue2extractable
+import org.json4s.string2JsonInput
 
-case class Monitor(var id: Option[String], frequency: Int, locations: Set[String], name: String, uri: String, `options-custom`: CustomOptions, slaThreshold: String, status: String, `type`: String)
+case class CustomOptions(labels: Set[String], alertPolicyId: Option[Int], scriptLines: Option[Seq[String]]) {
+	def script = scriptLines match {
+		case Some(lines) => Some(lines.mkString("\n"))
+		case None => None
+	}
+}
+
+object MonitorType extends Enumeration {
+  type MonitorType = Value
+  val SIMPLE, SCRIPT_API = Value
+}
+import MonitorType.MonitorType
+
+case class Monitor(var id: Option[String], frequency: Int, locations: Set[String], name: String, uri: Option[String], `options-custom`: CustomOptions, slaThreshold: String, status: String, `type`: MonitorType)
 
 case class MonitorsConfig(monitors: Seq[Monitor])
 
 object Monitor {
 
-	val formatWithCustomOptions = DefaultFormats
-	val formatWithoutCustomOptions = DefaultFormats + FieldSerializer[Monitor](FieldSerializer.ignore("options-custom"))
+	val formatWithCustomOptions = DefaultFormats + new EnumNameSerializer(MonitorType)
+	val formatWithoutCustomOptions = formatWithCustomOptions + FieldSerializer[Monitor](FieldSerializer.ignore("options-custom"))
 
 	def apply(json: JValue, ignoreCustomOptions: Boolean = false) = {
 		implicit val formats = chooseFormat(ignoreCustomOptions)
