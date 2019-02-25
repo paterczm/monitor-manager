@@ -28,18 +28,12 @@ class Manager(client: Client) {
 
 				monitor.id = Some(uuid)
 
-				monitor.`options-custom`.alertPolicyId match {
-					case None => ;
-					case Some(x) => {
-						val acres = client.createAlertCondition(monitor)
-
-						handleError(acres)
-					}
-				}
+				handleCustomOptions(monitor)
 
 				uuid
 			}
 			case Some(uuid) => {
+
 				val res = client.updateMonitor(monitor)
 
 				handleError(res)
@@ -48,23 +42,7 @@ class Manager(client: Client) {
 
 				labelMonitor(monitor.`options-custom`.labels, uuid)
 
-				monitor.`options-custom`.alertPolicyId match {
-					case None => ;
-					case Some(x) => {
-						val acres = client.createAlertCondition(monitor)
-
-						handleError(acres)
-					}
-				}
-
-				monitor.`options-custom`.script match {
-					case None => ;
-					case Some(script) => {
-						val scres = client.updateScriptOnMonitor(uuid, script)
-
-						handleError(scres)
-					}
-				}
+				handleCustomOptions(monitor)
 
 				uuid
 			}
@@ -100,7 +78,7 @@ class Manager(client: Client) {
 		writePretty(parse(res.body))
 	}
 
-		def listAlertPolicies() = {
+	def listAlertPolicies() = {
 		val res = client.listAlertPolicies()
 
 		handleError(res)
@@ -118,6 +96,28 @@ class Manager(client: Client) {
 		case s if s >= 400 && s <= 499 =>
 			println((parse(res.body) \\ "error").values); System.exit(1)
 		case _ => println(s"Error: $res"); System.exit(1)
+	}
+
+	private def handleCustomOptions(monitor: Monitor) {
+
+		monitor.`options-custom`.alertPolicyId match {
+			case None => ;
+			case Some(x) => {
+				val acres = client.createAlertCondition(monitor)
+
+				handleError(acres)
+			}
+		}
+
+		monitor.`options-custom`.script match {
+			case None => ;
+			case Some(script) => {
+				val scres = client.updateScriptOnMonitor(monitor.id.get, script)
+
+				handleError(scres)
+			}
+		}
+
 	}
 
 }
