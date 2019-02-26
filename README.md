@@ -60,12 +60,13 @@ Monitors definition looks like this:
        }
 	]
 }
-
-Scripted monitors are also supported, see [ScriptedMonitorTest](org/paterczm/newrelic/synthetics/ScriptedMonitorTest.scala).
-
 ```
 
-Those are all standard parameters from [new relic synthetics api](https://docs.newrelic.com/docs/apis/synthetics-rest-api/monitor-examples/manage-synthetics-monitors-rest-api), except for options-custom element, defining labels (using [new relic synthetics labels api](https://docs.newrelic.com/docs/apis/synthetics-rest-api/label-examples/use-synthetics-label-apis) ) and an alert policy (using [alert synthetics conditions api](https://rpm.newrelic.com/api/explore/alerts_synthetics_conditions/create)).
+Those are all standard parameters from [new relic synthetics monitor api](https://docs.newrelic.com/docs/apis/synthetics-rest-api/monitor-examples/manage-synthetics-monitors-rest-api), except for options-custom element, which can contain other resources:
+
+* labels ([new relic synthetics labels api](https://docs.newrelic.com/docs/apis/synthetics-rest-api/label-examples/use-synthetics-label-apis)),
+* an alert policy ([alert synthetics conditions api](https://rpm.newrelic.com/api/explore/alerts_synthetics_conditions/create)) 
+* and a script for API Test monitors ([script api for scripted browser and API test monitors]( https://docs.newrelic.com/docs/apis/synthetics-rest-api/monitor-examples/manage-synthetics-monitors-rest-api#scripted-api-monitors-api)).
 
 To create monitors:
 
@@ -73,7 +74,7 @@ To create monitors:
 monitor-manager monitors push --monitorsConfigFile monitors.json --apiKey <api key>
 ```
 
-The monitors config file contains references to locations and alert policy. You will need to create them manually and figure out what their ids are. The tool does not help with that right now.
+The monitors config file contains references to locations and alert policy. You will need to create them manually and figure out what their ids are. The tool helps with that a little - you can pull a list of existing locations and alert policies with ids.
 
 For each created monitor, the tool will update monitors config file with monitor ids, allowing for future updates to existing monitors. To update a monitor, simply edit the config file and run the monitors push command again.
 
