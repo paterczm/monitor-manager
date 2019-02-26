@@ -12,13 +12,23 @@ import org.json4s.jackson.JsonMethods.parse
 import org.json4s.jackson.Serialization.writePretty
 import org.json4s.jvalue2extractable
 import org.json4s.string2JsonInput
+import org.clapper.scalasti.ST
 
-case class CustomOptions(labels: Set[String], alertPolicyId: Option[Int], scriptLines: Option[Seq[String]]) {
-	def script = scriptLines match {
-		case Some(lines) => Some(lines.mkString("\n"))
-		case None => None
+case class Script(path: String, attributes: Map[String, String]) {
+
+	def renderScript() = {
+
+		val scriptTemplate = scala.io.Source.fromFile(path).getLines.mkString("\n")
+
+		val template = ST(scriptTemplate).addAttributes(attributes)
+
+		template.render().get
+
 	}
+
 }
+
+case class CustomOptions(labels: Set[String], alertPolicyId: Option[Int], script: Option[Script])
 
 object MonitorType extends Enumeration {
   type MonitorType = Value

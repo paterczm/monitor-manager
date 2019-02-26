@@ -112,7 +112,7 @@ class Manager(client: Client) {
 		monitor.`options-custom`.script match {
 			case None => ;
 			case Some(script) => {
-				val scres = client.updateScriptOnMonitor(monitor.id.get, script)
+				val scres = client.updateScriptOnMonitor(monitor.id.get, script.renderScript())
 
 				handleError(scres)
 			}
