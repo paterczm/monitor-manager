@@ -60,6 +60,9 @@ Monitors definition looks like this:
        }
 	]
 }
+
+Scripted monitors are also supported, see [ScriptedMonitorTest](org/paterczm/newrelic/synthetics/ScriptedMonitorTest.scala).
+
 ```
 
 Those are all standard parameters from [new relic synthetics api](https://docs.newrelic.com/docs/apis/synthetics-rest-api/monitor-examples/manage-synthetics-monitors-rest-api), except for options-custom element, defining labels (using [new relic synthetics labels api](https://docs.newrelic.com/docs/apis/synthetics-rest-api/label-examples/use-synthetics-label-apis) ) and an alert policy (using [alert synthetics conditions api](https://rpm.newrelic.com/api/explore/alerts_synthetics_conditions/create)).
