@@ -102,7 +102,8 @@ class Manager(client: Client) {
 
 		monitor.`options-custom`.alertPolicyId match {
 			case None => ;
-			case Some(x) => {
+			case Some(x) if monitor.id.isDefined => ; // don't create alert policy on update
+			case Some(x) if !monitor.id.isDefined => {
 				val acres = client.createAlertCondition(monitor)
 
 				handleError(acres)
