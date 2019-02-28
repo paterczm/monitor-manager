@@ -22,7 +22,9 @@ class MonitorTest extends FlatSpec with Matchers {
                 "123-bar"
             ],
             "name": "monitor-name",
-            "options": {},
+            "options": {
+              "validationString": "OK"
+            },
             "options-custom": {
               "labels": [
                 "Environment:Preprod",
@@ -70,5 +72,10 @@ class MonitorTest extends FlatSpec with Matchers {
 		println(monitorAsJsonString)
 
 		(parse(monitorAsJsonString)) \ "options-custom" should not be (JNothing)
+	}
+
+	"monitor.options.validationString" should "be OK" in {
+		monitor.options should be (defined)
+		monitor.options.get.validationString shouldBe Some("OK")
 	}
 }
