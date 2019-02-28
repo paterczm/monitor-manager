@@ -28,7 +28,7 @@ class Manager(client: Client) {
 
 				monitor.id = Some(uuid)
 
-				handleCustomOptions(monitor)
+				handleCustomOptions(monitor, true)
 
 				uuid
 			}
@@ -42,7 +42,7 @@ class Manager(client: Client) {
 
 				labelMonitor(monitor.`options-custom`.labels, uuid)
 
-				handleCustomOptions(monitor)
+				handleCustomOptions(monitor, false)
 
 				uuid
 			}
@@ -98,12 +98,12 @@ class Manager(client: Client) {
 		case _ => println(s"Error: $res"); System.exit(1)
 	}
 
-	private def handleCustomOptions(monitor: Monitor) {
+	private def handleCustomOptions(monitor: Monitor, createAlertCondition: Boolean) {
 
 		monitor.`options-custom`.alertPolicyId match {
 			case None => ;
-			case Some(x) if monitor.id.isDefined => ; // don't create alert policy on update
-			case Some(x) if !monitor.id.isDefined => {
+			case Some(x) if !createAlertCondition => ; // don't create alert policy on update
+			case Some(x) if createAlertCondition => {
 				val acres = client.createAlertCondition(monitor)
 
 				handleError(acres)
