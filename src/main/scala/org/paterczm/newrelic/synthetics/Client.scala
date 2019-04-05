@@ -11,8 +11,7 @@ class Client(val apiKey: String) {
 	val headers = Seq(("X-Api-Key", apiKey), ("Content-Type", "application/json"), ("Accept", "application/json"))
 
 	def deleteMonitor(uuid: String) = Http(s"https://synthetics.newrelic.com/synthetics/api/v3/monitors/$uuid")
-		.header("X-Api-Key", apiKey)
-		.header("Content-Type", "application/json")
+		.headers(headers)
 		.method("DELETE")
 		.asString
 

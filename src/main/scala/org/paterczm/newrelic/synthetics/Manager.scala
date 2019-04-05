@@ -70,6 +70,12 @@ class Manager(client: Client) {
 		})
 	}
 
+	def deleteMonitor(uuid: String) {
+		val res = client.deleteMonitor(uuid)
+
+		handleError(res)
+	}
+
 	def listLocations() = {
 		val res = client.listLocations()
 

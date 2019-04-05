@@ -7,8 +7,8 @@ import java.net.HttpURLConnection
 
 object App extends App {
 
-	case class Cli(apiKey: String, path: String, action: String, label: String) {
-		def this() = this(null, null, null, null)
+	case class Cli(apiKey: String, path: String, action: String, label: String, monitorUuid: Option[String]) {
+		def this() = this(null, null, null, null, None)
 	}
 
 	val parser = new scopt.OptionParser[Cli]("monitor-manager") {
@@ -31,6 +31,12 @@ object App extends App {
 					.children(
 						opt[String]('l', "label").required().valueName("Label, e.g. Team:Paas")
 							.action((str, cli) => cli.copy(label = str))
+					),
+				cmd("delete").action((_, cli) => cli.copy(action = "monitors-delete"))
+					.text("Delete monitor by id")
+					.children(
+						opt[String]('i', "id").required().valueName("Monitor id")
+							.action((str, cli) => cli.copy(monitorUuid = Some(str)))
 					)
 			)
 
@@ -67,13 +73,16 @@ object App extends App {
 				case "monitors-pull" => {
 					println(manager.listMonitorsByLabel(cli.label))
 				}
+				case "monitors-delete" => {
+					manager.deleteMonitor(cli.monitorUuid.get)
+				}
 				case "locations-pull" => {
 					println(manager.listLocations())
 				}
 				case "alertpolicies-pull" => {
 					println(manager.listAlertPolicies())
 				}
-				case _ => println("Not supported")
+				case _ => println("Operation not supported")
 			}
 
 		}
