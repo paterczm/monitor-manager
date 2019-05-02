@@ -13,14 +13,19 @@ import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization.{ read, write }
 
 @RunWith(classOf[JUnitRunner])
-class CliTest extends FlatSpec with Matchers {
+class CliApiKeyTest extends FlatSpec with Matchers {
 
-	"apiKey" should "is required" in {
-		Cli.parser.parse(List("monitors", "push", "-c", "file"), new Cli.Params()) match {
-            case Some(cli) => {
-                Assert.fail("Missing apiKey should not be accepted")
+    def parse(onSuccess: (Cli.Params) => Unit, onFailure: () => Unit) {
+        Cli().parse(List("monitors", "push", "-c", "file"), new Cli.Params()) match {
+            case Some(params) => {
+                onSuccess(params)
             }
-            case None => ;
+            case None => onFailure()
         }
+    }
+
+	"apiKey" should "not be required" in {
+        parse((params: Cli.Params) => Unit, () => Assert.fail())
 	}
+
 }
