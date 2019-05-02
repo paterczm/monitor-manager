@@ -7,12 +7,14 @@ import java.net.HttpURLConnection
 
 object App extends App {
 
-	Cli().parse(args, new Cli.Params()) match {
+	val envApiKey = sys.env.get("NEWRELIC_API_KEY")
+
+	Cli(envApiKey).parse(args, new Cli.Params()) match {
 		case Some(cli) => {
 
 			val apiKey = cli.apiKey match {
 				case Some(key) => key
-				case None => sys.env.get("NEWRELIC_API_KEY") match {
+				case None => envApiKey match {
 					case Some(key) => key
 					case None => throw new IllegalArgumentException("New Relic apiKey needs to be provided either by specifying NEWRELIC_API_KEY environment variable or using --apiKey cli parameter")
 				}

@@ -6,7 +6,7 @@ object Cli {
 		def this() = this(None, null, null, null, None)
 	}
 
-    def apply() = {
+    def apply(envApiKey: Option[String]) = {
 
         new scopt.OptionParser[Params]("monitor-manager") {
             head("Command line tool to manage New Relic Synthetics Monitors")
@@ -52,7 +52,7 @@ object Cli {
             )
 
             checkConfig( params =>
-                if (!params.apiKey.isEmpty || !sys.env.get("NEWRELIC_API_KEY").isEmpty) success else failure("New Relic apiKey needs to be provided either by specifying NEWRELIC_API_KEY environment variable or using --apiKey cli parameter") )
+                if (!params.apiKey.isEmpty || !envApiKey.isEmpty) success else failure("New Relic apiKey needs to be provided either by specifying NEWRELIC_API_KEY environment variable or using --apiKey cli parameter") )
         }
     }
 
