@@ -50,6 +50,9 @@ object Cli {
                     cmd("pull").action((_, params) => params.copy(action = "alertpolicies-pull"))
                         .text("Pull all alert policies")
             )
+
+            checkConfig( params =>
+                if (!params.apiKey.isEmpty || !sys.env.get("NEWRELIC_API_KEY").isEmpty) success else failure("New Relic apiKey needs to be provided either by specifying NEWRELIC_API_KEY environment variable or using --apiKey cli parameter") )
         }
     }
 
