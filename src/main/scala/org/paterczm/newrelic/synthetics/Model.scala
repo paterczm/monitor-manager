@@ -38,7 +38,7 @@ import MonitorType.MonitorType
 
 case class Options(validationString: Option[String], verifySSL: Option[Boolean], bypassHeadRequest: Option[Boolean], treatRedirectAsFailure: Option[Boolean])
 
-case class Monitor(var id: Option[String], frequency: Int, locations: Set[String], name: String, uri: Option[String], slaThreshold: String, status: String, `type`: MonitorType, options: Option[Options], `options-custom`: CustomOptions)
+case class Monitor(var id: Option[String], frequency: Int, locations: Set[String], name: String, uri: Option[String], slaThreshold: String, status: String, `type`: MonitorType, options: Option[Options], `options-custom`: Option[CustomOptions])
 
 case class MonitorsConfig(monitors: Seq[Monitor])
 

@@ -56,7 +56,7 @@ class Client(val apiKey: String) {
 		.asString
 
 	// https://rpm.newrelic.com/api/explore/alerts_synthetics_conditions/create
-	def createAlertCondition(monitor: Monitor) = Http(s"https://api.newrelic.com/v2/alerts_synthetics_conditions/policies/${monitor.`options-custom`.alertPolicyId.get}.json")
+	def createAlertCondition(monitor: Monitor) = Http(s"https://api.newrelic.com/v2/alerts_synthetics_conditions/policies/${monitor.`options-custom`.get.alertPolicyId.get}.json")
 		.headers(headers)
 		.postData(s"""{
   "synthetics_condition": {

@@ -24,7 +24,9 @@ class Manager(client: Client) {
 
 				println(s"Successfully created monitor uuid=$uuid")
 
-				labelMonitor(monitor.`options-custom`.labels, uuid)
+				if (monitor.`options-custom`.isDefined) {
+				  labelMonitor(monitor.`options-custom`.get.labels, uuid)
+				}
 
 				monitor.id = Some(uuid)
 
@@ -40,7 +42,9 @@ class Manager(client: Client) {
 
 				println(s"Successfully updated monitor uuid=$uuid")
 
-				labelMonitor(monitor.`options-custom`.labels, uuid)
+				if (monitor.`options-custom`.isDefined) {
+				  labelMonitor(monitor.`options-custom`.get.labels, uuid)
+				}
 
 				handleCustomOptions(monitor, false)
 
@@ -106,7 +110,9 @@ class Manager(client: Client) {
 
 	private def handleCustomOptions(monitor: Monitor, createAlertCondition: Boolean) {
 
-		monitor.`options-custom`.alertPolicyId match {
+		if (monitor.`options-custom`.isDefined) {
+
+		monitor.`options-custom`.get.alertPolicyId match {
 			case None => ;
 			case Some(x) if !createAlertCondition => ; // don't create alert policy on update
 			case Some(x) if createAlertCondition => {
@@ -116,13 +122,14 @@ class Manager(client: Client) {
 			}
 		}
 
-		monitor.`options-custom`.script match {
+		monitor.`options-custom`.get.script match {
 			case None => ;
 			case Some(script) => {
 				val scres = client.updateScriptOnMonitor(monitor.id.get, script.renderScript())
 
 				handleError(scres)
 			}
+		}
 		}
 
 	}

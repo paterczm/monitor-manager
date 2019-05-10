@@ -55,8 +55,8 @@ class MonitorTest extends FlatSpec with Matchers {
 	}
 
 	"monitor.options-custom" should "include labels" in {
-		monitor.`options-custom`.labels.size should be(3)
-		monitor.`options-custom`.alertPolicyId should be(None)
+		monitor.`options-custom`.get.labels.size should be(3)
+		monitor.`options-custom`.get.alertPolicyId should be(None)
 	}
 
 	"monitor" should "serialize without custom-options when ignoreCustomOptions=true" in {

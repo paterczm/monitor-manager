@@ -36,12 +36,12 @@ class ScriptedMonitorTest extends FlatSpec with Matchers {
 	val monitor = Monitor(json)
 
 	"monitor.options-custom.script" should "defined" in {
-		monitor.`options-custom`.script shouldBe defined
+		monitor.`options-custom`.get.script shouldBe defined
 	}
 
 	"monitor.options-custom.script" should "have the uri attribute" in {
-		monitor.`options-custom`.script.get.attributes.size shouldBe (1)
-		monitor.`options-custom`.script.get.attributes("uri") shouldBe ("https://foo.com/health")
+		monitor.`options-custom`.get.script.get.attributes.size shouldBe (1)
+		monitor.`options-custom`.get.script.get.attributes("uri") shouldBe ("https://foo.com/health")
 	}
 
 	val expectedScript =
@@ -54,7 +54,7 @@ class ScriptedMonitorTest extends FlatSpec with Matchers {
     |);""".stripMargin
 
 	"script" should "render" in {
-		monitor.`options-custom`.script.get.renderScript() shouldBe (expectedScript)
+		monitor.`options-custom`.get.script.get.renderScript() shouldBe (expectedScript)
 	}
 
 }
