@@ -20,7 +20,7 @@ object App extends App {
 				}
 			}
 
-			val client = new Client(apiKey)
+			val client = new Client(apiKey.trim())
 			val manager = new Manager(client)
 
 			cli.action match {
